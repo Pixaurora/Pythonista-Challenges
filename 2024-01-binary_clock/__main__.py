@@ -23,6 +23,6 @@ while True:
     binary_timestamp: str = current_binary_timestamp()
 
     print(binary_timestamp)
-    print(f'\033[{len(binary_timestamp.splitlines())}A', end='') # Go back to the top
+    print(f'\033[{len(binary_timestamp.splitlines())}A', end='')  # Go back to the top
 
     time.sleep(time_to_next_sec().total_seconds())
