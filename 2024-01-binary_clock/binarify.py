@@ -1,7 +1,7 @@
-from . import proper
+from . import one_liner, proper
 
 
-tested_function = proper.binarify
+tested_functions = [('proper', proper.binarify), ('one liner', one_liner.binarify)]
 
 test_cases = [
     (('18:57:31',), ' 1  0  0\n 0 11 00\n00 01 10\n10 11 11'),
