@@ -11,7 +11,10 @@ log = logging.getLogger(__name__)
 
 def main(tested_functions: list[tuple[str, TestedFunction]], test_cases: list[Test], display_method: DisplayMethod, project_name: str):
     for title, tested_function in tested_functions:
-        print(f'=== Testing {title} implementation for {project_name} ===')
+        implementation_name: str = f"{title} " if title else ""
+        implementation_name += "implementation"
+
+        print(f'=== Testing {implementation_name} for {project_name} ===')
 
         for case_id, test in enumerate(test_cases, start=1):
             print(f'Test #{case_id} result: ', end='')

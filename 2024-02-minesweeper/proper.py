@@ -90,6 +90,7 @@ class Line(NamedTuple):
 
         return Vec[float](offsets.dot_product(coeff_matrix_i[0]), offsets.dot_product(coeff_matrix_i[1]))
 
+
 def find(sound_1: SoundImpactData, sound_2: SoundImpactData, sound_3: SoundImpactData) -> tuple[int, int]:
     circle_1, circle_2, circle_3 = (Circle(Vec(s[0], s[1]), s[2] * SPEED_OF_SOUND) for s in (sound_1, sound_2, sound_3))
 
