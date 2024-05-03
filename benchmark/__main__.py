@@ -1,4 +1,5 @@
 import logging
+import gc
 import sys
 
 from benchmark.errors import IncorrectOutput
@@ -20,6 +21,7 @@ def main(tested_functions: list[tuple[str, TestedFunction]], test_cases: list[Te
             print(f'Test #{case_id} result: ', end='')
 
             try:
+                gc.disable()
                 print(f'Success! Took {test.benchmark(tested_function) * 1000} ms on average to complete!')
             except IncorrectOutput as output:
                 output = output.format(display_method)
@@ -27,6 +29,9 @@ def main(tested_functions: list[tuple[str, TestedFunction]], test_cases: list[Te
             except Exception as e:
                 print('Failure! Raised an exception.')
                 log.error('Showing exception', exc_info=e)
+            finally:
+                gc.enable()
+                gc.collect()
 
 
 usage: str = 'Usage: `benchmark <module_name> <test_repetitions=1_000_000>`'

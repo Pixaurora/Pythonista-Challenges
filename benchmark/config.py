@@ -1,3 +1,4 @@
+import copy
 import importlib
 import timeit
 from types import ModuleType
@@ -27,12 +28,13 @@ class Test(Generic[T]):
         self.expected = expected
 
     def benchmark(self, tested_function: TestedFunction[T]) -> float:
-        actual: T = tested_function(*self.args)
+        copied_args = copy.deepcopy(self.args) # Copy the args so that if the tested function mutates them, it won't mess up future tests.
+        actual: T = tested_function(*copied_args)
 
         if actual != self.expected:
             raise IncorrectOutput[T](self.expected, actual)
 
-        return timeit.timeit(lambda: tested_function(*self.args), number=self.repetitions) / self.repetitions
+        return timeit.timeit(lambda: tested_function(*copied_args), number=self.repetitions) / self.repetitions
 
 
 def setup(module_name: str, repetitions: int) -> tuple[list[tuple[str, TestedFunction[Any]]], list[Test[Any]], DisplayMethod[Any]]:
