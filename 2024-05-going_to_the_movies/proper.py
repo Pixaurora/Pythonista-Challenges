@@ -1,0 +1,6 @@
+def find_seats(seats: list[list[int]], n: int) -> int:
+    ...
+
+
+def optimal_seats(seats: list[list[int]], n: int) -> int:
+    ...
