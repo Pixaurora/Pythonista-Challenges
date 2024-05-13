@@ -1,5 +1,5 @@
-import logging
 import gc
+import logging
 import sys
 
 from benchmark.errors import IncorrectOutput

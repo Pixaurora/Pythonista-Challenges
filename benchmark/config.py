@@ -28,7 +28,7 @@ class Test(Generic[T]):
         self.expected = expected
 
     def benchmark(self, tested_function: TestedFunction[T]) -> float:
-        copied_args = copy.deepcopy(self.args) # Copy the args so that if the tested function mutates them, it won't mess up future tests.
+        copied_args = copy.deepcopy(self.args)  # Copy the args so that if the tested function mutates them, it won't mess up future tests.
         actual: T = tested_function(*copied_args)
 
         if actual != self.expected:
