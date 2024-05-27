@@ -1,7 +1,7 @@
-from . import proper
+from . import optimized, proper
 
 
-tested_function = proper.optimal_seats
+tested_functions = [('proper', proper.optimal_seats), ('optimized', optimized.optimal_seats)]
 
 test_cases = [
     (([[1, 0, 1, 0, 1, 0, 1], [0, 1, 0, 0, 0, 0, 0]], 2), (3, 1)),

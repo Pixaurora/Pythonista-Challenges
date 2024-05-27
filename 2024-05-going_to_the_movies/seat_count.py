@@ -1,7 +1,7 @@
-from . import proper
+from . import optimized, proper
 
 
-tested_function = proper.find_seats
+tested_functions = [('proper', proper.find_seats), ('optimized', optimized.find_seats)]
 
 test_cases = [
     (([[1, 0, 1, 0, 1, 0, 1], [0, 1, 0, 0, 0, 0, 0]], 2), 4),
