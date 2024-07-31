@@ -4,14 +4,18 @@ def binarify(time: str):
             ''.join,
             zip(
                 *[
-                    [
-                        ' '
-                        if char_num in (3, 6) and twos_place == 3 or char_num == 0 and twos_place in (2, 3)
-                        else str(int(char) >> twos_place & 1)
-                        for twos_place in range(4)[::-1]
-                    ]
-                    if char.isnumeric()
-                    else [' '] * 4
+                    (
+                        [
+                            (
+                                ' '
+                                if char_num in (3, 6) and twos_place == 3 or char_num == 0 and twos_place in (2, 3)
+                                else str(int(char) >> twos_place & 1)
+                            )
+                            for twos_place in range(4)[::-1]
+                        ]
+                        if char.isnumeric()
+                        else [' '] * 4
+                    )
                     for char_num, char in enumerate(time)
                 ]
             ),

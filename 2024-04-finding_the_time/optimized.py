@@ -83,8 +83,6 @@ class YearToBot(Operation):
     year: str
 
     def apply(self, dates: list[str]) -> None:
-        end_index: int = len(dates)
-
         for index in indices_with_property(year, self.year, dates):
             dates.append(dates.pop(index))
 
