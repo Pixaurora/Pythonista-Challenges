@@ -1,30 +1,31 @@
 import gc
 import logging
 import sys
+from typing import Any
 
 from benchmark.errors import IncorrectOutput
 
-from .config import DisplayMethod, Test, TestedFunction, setup
+from .config import TestProfile, setup
 
 
 log = logging.getLogger(__name__)
 
 
-def main(tested_functions: list[tuple[str, TestedFunction]], test_cases: list[Test], display_method: DisplayMethod, project_name: str):
-    for title, tested_function in tested_functions:
+def main(test_profile: TestProfile[Any], project_name: str):
+    for title, tested_function in test_profile.functions:
         implementation_name: str = f"{title} " if title else ""
         implementation_name += "implementation"
 
         print(f'=== Testing {implementation_name} for {project_name} ===')
 
-        for case_id, test in enumerate(test_cases, start=1):
+        for case_id, test in enumerate(test_profile.cases, start=1):
             print(f'Test #{case_id} result: ', end='')
 
             try:
                 gc.disable()
                 print(f'Success! Took {test.benchmark(tested_function) * 1000} ms on average to complete!')
             except IncorrectOutput as output:
-                output = output.format(display_method)
+                output = output.format(test_profile.display)
                 print('Failure! Unexpected output.', 'Input:', *test.args, 'Expected:', output.expected, 'Actual:', output.actual, sep='\n')
             except Exception as e:
                 print('Failure! Raised an exception.')
@@ -53,4 +54,4 @@ else:
 
 project_name = module_name[module_name.rfind('-') + 1 :].replace('_', ' ')
 
-main(*setup(module_name, test_repetitions), project_name)
+main(setup(module_name, test_repetitions), project_name)
