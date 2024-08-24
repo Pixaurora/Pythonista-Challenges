@@ -100,3 +100,7 @@ test_cases = [
         ],
     ),
 ]
+
+
+def verify(val1: list[str], val2: list[str]):
+    return set(val1) == set(val2)
