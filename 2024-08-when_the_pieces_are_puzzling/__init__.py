@@ -1,3 +1,5 @@
+from typing import Self
+
 from . import proper
 
 
@@ -102,5 +104,22 @@ test_cases = [
 ]
 
 
-def verify(val1: list[str], val2: list[str]):
-    return set(val1) == set(val2)
+class Piece:
+    sides: tuple[str, ...]
+
+    def __init__(self, b: tuple[str, ...]):
+        self.sides = b
+
+    def __hash__(self) -> int:
+        return sum(hash(i) for i in self.sides)
+
+    def __eq__(self, other: Self):
+        return set(self.sides) == set(other.sides)
+
+
+def piece_to_comparable(piece: str) -> Piece:
+    return Piece(tuple(piece.split('@')[1:]))  # Start from 2nd element because the first is always ''
+
+
+def verify(pieces_1: list[str], pieces_2: list[str]) -> bool:
+    return set(map(piece_to_comparable, pieces_1)) == set(map(piece_to_comparable, pieces_2))
