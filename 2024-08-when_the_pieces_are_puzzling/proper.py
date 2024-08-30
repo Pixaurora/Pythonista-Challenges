@@ -30,30 +30,22 @@ class SideDirection(StrEnum):
         return letter_to_piece_side.get(letter)
 
 
-class Side(NamedTuple):
-    edges: list[int]
-    direction: SideDirection
+def side_from_str(representation: str) -> tuple[list[int], SideDirection] | None:
+    direction: SideDirection | None = SideDirection.from_str(representation[0])
 
-    @classmethod
-    def from_str(cls, representation: str) -> Side | None:
-        direction: SideDirection | None = SideDirection.from_str(representation[0])
+    if direction is None:
+        return
 
-        if direction is None:
-            return
+    edges: list[int] = []
+    for edge in re.findall(edge_regex, representation):
+        edges.append(int(edge))
 
-        edges: list[int] = []
-        for edge in re.findall(edge_regex, representation):
-            edges.append(int(edge))
-
-        return Side(edges, direction)
-
-    def __len__(self):
-        return len(self.edges)
+    return (edges, direction)
 
 
 class Piece(NamedTuple):
     representation: str
-    sides: dict[SideDirection, Side]
+    sides: dict[SideDirection, list[int]]
 
     @classmethod
     def from_str(cls, representation: str) -> Piece | None:
@@ -62,16 +54,16 @@ class Piece(NamedTuple):
         if piece is None:
             return
 
-        sides: dict[SideDirection, Side] = {}
+        sides: dict[SideDirection, list[int]] = {}
 
         for i in range(4):
             side = piece.group(i + 1)
-            side = Side.from_str(side)
+            side = side_from_str(side)
 
-            if side is None or sides.get(side.direction) is not None:
+            if side is None or sides.get(side[1]) is not None:
                 return
 
-            sides[side.direction] = side
+            sides[side[1]] = side[0]
 
         if len(sides) != 4:
             return
@@ -83,15 +75,21 @@ class Piece(NamedTuple):
 
     @property
     def is_valid(self) -> bool:
-        return self.all_sides_same_length and not self.has_internal_collisions
+        return self.all_sides_same_length and not self.has_collisions_in_opposing_sides
 
     @property
     def all_sides_same_length(self) -> bool:
         return len({len(side) for side in self.sides.values()}) == 1
 
     @property
-    def has_internal_collisions(self) -> bool:
-        # TODO: Somehow find collisions
+    def has_collisions_in_opposing_sides(self) -> bool:
+        size: int = len(self)
+
+        for main, opposite in ((SideDirection.TOP, SideDirection.BOTTOM), (SideDirection.LEFT, SideDirection.RIGHT)):
+            for main_edge, opposite_edge in zip(self.sides[main], self.sides[opposite]):
+                if size + opposite_edge + main_edge <= 0:
+                    return True
+
         return False
 
     def __str__(self) -> str:
