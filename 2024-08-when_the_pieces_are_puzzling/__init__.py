@@ -1,9 +1,9 @@
 from typing import Self
 
-from . import proper
+from . import optimized, proper
 
 
-tested_function = proper.sort
+tested_functions = [('Optimized but Cursed', optimized.sort), ('Proper', proper.sort)]
 
 test_cases = [
     (
