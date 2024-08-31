@@ -1,15 +1,10 @@
 from __future__ import annotations
 
-import re
 from enum import StrEnum
-from re import Match
 from typing import NamedTuple
 
 
 letter_to_piece_side: dict[str, SideDirection] = {}
-
-edge_regex: str = r'-?\d'
-piece_regex: str = fr'@(\w(?:{edge_regex})+)' * 4
 
 
 class SideDirection(StrEnum):
@@ -37,8 +32,25 @@ def side_from_str(representation: str) -> tuple[list[int], SideDirection] | None
         return
 
     edges: list[int] = []
-    for edge in re.findall(edge_regex, representation):
-        edges.append(int(edge))
+
+    index: int = 1
+    sign: int = +1
+    while index < len(representation):
+        try:
+            converted: str = representation[index]
+
+            if converted == '-':
+                sign = -1
+            else:
+                next: int = sign * int(converted)
+
+                sign = +1
+                edges.append(next)
+        except ValueError | IndexError:
+            # Side isn't valid because - is the last char, or can't be parsed as an int
+            return
+
+        index += 1
 
     return (edges, direction)
 
@@ -46,43 +58,43 @@ def side_from_str(representation: str) -> tuple[list[int], SideDirection] | None
 class Piece(NamedTuple):
     representation: str
     sides: dict[SideDirection, list[int]]
+    size: int
 
     @classmethod
     def from_str(cls, representation: str) -> Piece | None:
-        piece: Match | None = re.match(piece_regex, representation)
+        piece: list[str] = representation.split('@')
 
-        if piece is None:
+        if len(piece) != 5:  # First split is simply '' as the string starts with @
             return
 
         sides: dict[SideDirection, list[int]] = {}
+        size: int | None = None
 
         for i in range(4):
-            side = piece.group(i + 1)
+            side = piece[i + 1]
             side = side_from_str(side)
 
-            if side is None or sides.get(side[1]) is not None:
+            if side is None:
                 return
 
-            sides[side[1]] = side[0]
+            edges, direction = side
 
-        if len(sides) != 4:
+            if size is None:
+                size = len(edges)
+            elif size != len(edges) or sides.get(direction) is not None:
+                return
+
+            sides[direction] = edges
+
+        if size is None or len(sides) != 4:
             return
 
-        return cls(representation, sides)
+        return cls(representation, sides, size)
 
     def __len__(self):
-        return len(self.sides[SideDirection.LEFT])
+        return self.size
 
-    @property
-    def is_valid(self) -> bool:
-        return self.all_sides_same_length and not self.has_collisions_in_opposing_sides
-
-    @property
-    def all_sides_same_length(self) -> bool:
-        return len({len(side) for side in self.sides.values()}) == 1
-
-    @property
-    def has_collisions_in_opposing_sides(self) -> bool:
+    def is_self_colliding(self) -> bool:
         size: int = len(self)
 
         for main, opposite in ((SideDirection.TOP, SideDirection.BOTTOM), (SideDirection.LEFT, SideDirection.RIGHT)):
@@ -97,7 +109,7 @@ class Piece(NamedTuple):
 
 
 def sort(pieces: list[str]) -> list[str]:
-    parsed_pieces: list[Piece] = [piece for piece in map(Piece.from_str, pieces) if piece is not None and piece.is_valid]
+    parsed_pieces: list[Piece] = [piece for piece in map(Piece.from_str, pieces) if piece is not None and not piece.is_self_colliding()]
 
     pieces_by_len: dict[int, list[Piece]] = {}
     for piece in parsed_pieces:
